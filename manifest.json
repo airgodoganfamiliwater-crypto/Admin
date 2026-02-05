@@ -1,0 +1,24 @@
+{
+  "name": "FAMILI WATER",
+  "short_name": "Admin",
+  "description": "Aplikasi Admin Famili Water untuk pencatatan dan monitoring",
+  "lang": "id-ID",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0041cd",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "ikon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "ikon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
