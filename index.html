@@ -199,7 +199,7 @@ button:active{transform:scale(.96)}
 <div id="lainnyaBox"></div>
 <button class="btn-add" onclick="tambahLainnya()">➕ Tambah Lainnya</button>
 
-<h3>Total Profit</h3>
+<h3>Total Uang</h3>
 <input id="totalProfit" readonly>
 
 <button onclick="kirim()">Kirim Data</button>
@@ -326,49 +326,78 @@ fontMinus.onclick=()=>{
 // SUBMIT
 async function kirim(){
 
-if(isEmptyForm()){
-  showPopup("❌ Data belum lengkap!");
-  return;
-}
+  // VALIDASI WAJIB
+  if(isEmptyForm()){
+    showPopup("❌ Data belum lengkap!");
+    return;
+  }
 
- const data={
-  tanggal:tanggal.value,
-  loyang:getRaw("loyang"),
-  galon:getRaw("galon"),
-  fee:getRaw("fee"),
-  saldo:getRaw("saldo"),
+  // ================= PENGELUARAN LAINNYA =================
+  let lainnya = [];
+  let totalLainnya = 0;
 
-  klien:getRaw("klien"),
-  pembayaranKlien:getRaw("klien")*5500,
+  document.querySelectorAll("#lainnyaBox .row").forEach(row=>{
+    const ket = row.children[0].value || "";
+    const harga = Number(row.children[1].value.replace(/\./g,"")) || 0;
+    if(ket || harga){
+      lainnya.push({keterangan: ket, harga: harga});
+      totalLainnya += harga;
+    }
+  });
 
-  sales:getRaw("sales"),
-  pembayaranSales:getRaw("paySales"),
+  // ================= HITUNG TOTAL =================
+  const klienPay = getRaw("klien") * 5500;
+  const salesPay = getRaw("paySales");
 
-  pengeluaran:{
-    gas:getRaw("gasHarga"),
-    tutup:getRaw("tutupHarga"),
-    bensin:getRaw("bensinHarga"),
-    listrik:getRaw("listrik")
-  },
+  const gas = getRaw("gasHarga");
+  const tutup = getRaw("tutupHarga");
+  const bensin = getRaw("bensinHarga");
+  const listrik = getRaw("listrik");
 
-  totalProfit:
-    (getRaw("klien")*5500 + getRaw("paySales")) -
-    (getRaw("gasHarga")+getRaw("tutupHarga")+getRaw("bensinHarga")+getRaw("listrik")),
+  const totalPengeluaran = gas + tutup + bensin + listrik + totalLainnya;
+  const totalProfit = (klienPay + salesPay) - totalPengeluaran;
 
-  adminUID:auth.currentUser.uid,
-  adminNama:adminData?.nama || "unknown",
-  adminID:adminData?.id || "unknown",
-  createdAt:firebase.firestore.FieldValue.serverTimestamp()
- };
+  // ================= DATA FIRESTORE =================
+  const data = {
+    tanggal: tanggal.value,
+    loyang: getRaw("loyang"),
+    galon: getRaw("galon"),
+    fee: getRaw("fee"),
+    saldo: getRaw("saldo"),
 
- try{
-   await db.collection("inputAdmin").add(data);
-   showPopup("✅ Data berhasil disimpan");
-   setTimeout(()=>location.href="riwayat.html",1200);
- }catch(e){
-   console.error(e);
-   showPopup("❌ Gagal simpan data");
- }
+    klien: getRaw("klien"),
+    pembayaranKlien: klienPay,
+
+    sales: getRaw("sales"),
+    pembayaranSales: salesPay,
+
+    pengeluaran: {
+      gas: gas,
+      tutup: tutup,
+      bensin: bensin,
+      listrik: listrik,
+      lainnya: lainnya,
+      totalPengeluaran: totalPengeluaran
+    },
+
+    totalProfit: totalProfit,
+
+    adminUID: auth.currentUser.uid,
+    adminNama: adminData?.nama || "unknown",
+    adminID: adminData?.id || "unknown",
+
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  // ================= SIMPAN =================
+  try{
+    await db.collection("inputAdmin").add(data);
+    showPopup("✅ Data berhasil disimpan");
+    setTimeout(()=>location.href="riwayat.html",1200);
+  }catch(e){
+    console.error(e);
+    showPopup("❌ Gagal simpan data");
+  }
 }
   // PWA 
   if ('serviceWorker' in navigator) {

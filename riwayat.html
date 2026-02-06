@@ -217,28 +217,45 @@ async function loadData(uid){
   arr.forEach(d=>{
     totalAll += Number(d.totalProfit)||0;
 
+    // ==== PENGELUARAN ====
+    const p = d.pengeluaran || {};
+    const lainnya = (p.lainnya || []).map(x=>`${x.keterangan}: ${rupiah(x.harga)}`).join("<br>");
+
     const div=document.createElement("div");
     div.className="item";
     div.innerHTML=`
       <div class="line bold">📅 ${formatTanggal(d.tanggal)}</div>
 
-      <div class="line">Loyang: <b>${d.loyang}</b></div>
-      <div class="line">Galon: <b>${d.galon}</b></div>
+      <div class="line">Loyang: <b>${d.loyang||0}</b></div>
+      <div class="line">Galon: <b>${d.galon||0}</b></div>
       <div class="line">Fee: <b>${d.fee||0}</b></div>
       <div class="line">Saldo: <b>${d.saldo||0}</b></div>
 
       <hr>
 
-      <div class="line">Klien: <b>${d.klien}</b></div>
+      <div class="line">Klien: <b>${d.klien||0}</b></div>
       <div class="line">Pembayaran Klien: <b>${rupiah(d.pembayaranKlien)}</b></div>
 
-      <div class="line">Sales: <b>${d.sales}</b></div>
+      <div class="line">Sales: <b>${d.sales||0}</b></div>
       <div class="line">Pembayaran Sales: <b>${rupiah(d.pembayaranSales)}</b></div>
 
       <hr>
 
-      <div class="line bold">Jumlah Uang: ${rupiah(d.totalProfit)}</div>
+      <div class="line bold">Pengeluaran:</div>
+      <div class="line">Gas: ${rupiah(p.gas)}</div>
+      <div class="line">Tutup: ${rupiah(p.tutup)}</div>
+      <div class="line">Bensin: ${rupiah(p.bensin)}</div>
+      <div class="line">Listrik: ${rupiah(p.listrik)}</div>
+
+      ${lainnya ? `<div class="line bold">Lainnya:</div><div class="line small">${lainnya}</div>` : ""}
+
+      <div class="line bold">Total Pengeluaran: ${rupiah(p.totalPengeluaran)}</div>
+
+      <hr>
+
+      <div class="line bold">💰 Total Uang: ${rupiah(d.totalProfit)}</div>
     `;
+
     list.appendChild(div);
   });
 
