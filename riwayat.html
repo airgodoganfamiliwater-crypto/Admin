@@ -8,10 +8,6 @@
 <link rel="icon" href="ikon-512.png">
 <title>Riwayat Input Admin Cabang</title>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
 <style>
 :root{
   --primary:#2563eb;
@@ -155,7 +151,9 @@ button:active{transform:scale(.96)}
 
 </div>
 </div>
-
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 <script>
 // Firebase
 firebase.initializeApp({
@@ -164,10 +162,10 @@ firebase.initializeApp({
   projectId:"klien-39696"
 });
 
-const auth=firebase.auth();
-const db=firebase.firestore();
-const list=document.getElementById("list");
-const summaryTotal=document.getElementById("summaryTotal");
+const auth = firebase.auth();
+const db = firebase.firestore();
+const list = document.getElementById("list");
+const summaryTotal = document.getElementById("summaryTotal");
 
 // Rupiah format
 function rupiah(n){
@@ -194,7 +192,7 @@ auth.onAuthStateChanged(async user=>{
   loadData(user.uid);
 });
 
-// LOAD DATA (NO INDEX)
+// LOAD DATA (FILTER BULAN SEKARANG)
 async function loadData(uid){
   const snap = await db.collection("inputAdmin")
     .where("adminUID","==",uid)
@@ -205,25 +203,43 @@ async function loadData(uid){
     return;
   }
 
-  let arr=[];
-  snap.forEach(d=>arr.push(d.data()));
+  const now = new Date();
+  const currentMonth = now.getMonth(); // 0-11
+  const currentYear = now.getFullYear();
+
+  let arr = [];
+  snap.forEach(d=>{
+    const data = d.data();
+    if(data.tanggal){
+      const t = new Date(data.tanggal);
+      // Filter: hanya bulan dan tahun sekarang
+      if(t.getMonth() === currentMonth && t.getFullYear() === currentYear){
+        arr.push(data);
+      }
+    }
+  });
+
+  if(arr.length === 0){
+    list.innerHTML="<p class='small'>Belum ada data bulan ini</p>";
+    summaryTotal.innerHTML = "";
+    return;
+  }
 
   // Sort terbaru
   arr.sort((a,b)=>(b.tanggal||"").localeCompare(a.tanggal||""));
 
-  list.innerHTML="";
-  let totalAll=0;
+  list.innerHTML = "";
+  let totalAll = 0;
 
   arr.forEach(d=>{
     totalAll += Number(d.totalProfit)||0;
 
-    // ==== PENGELUARAN ====
     const p = d.pengeluaran || {};
     const lainnya = (p.lainnya || []).map(x=>`${x.keterangan}: ${rupiah(x.harga)}`).join("<br>");
 
-    const div=document.createElement("div");
-    div.className="item";
-    div.innerHTML=`
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
       <div class="line bold">📅 ${formatTanggal(d.tanggal)}</div>
 
       <div class="line">Loyang: <b>${d.loyang||0}</b></div>
@@ -255,7 +271,6 @@ async function loadData(uid){
 
       <div class="line bold">💰 Total Uang: ${rupiah(d.totalProfit)}</div>
     `;
-
     list.appendChild(div);
   });
 
@@ -286,15 +301,16 @@ document.getElementById("fontMinus").onclick=()=>{
     localStorage.setItem("fontSizeAdmin",fontSize);
   }
 };
+
 /* ============================================= */
-  // PWA 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('✅ Service Worker registered'))
-        .catch(err => console.error('❌ Service Worker failed:', err));
-    });
-  }
+// PWA 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('✅ Service Worker registered'))
+      .catch(err => console.error('❌ Service Worker failed:', err));
+  });
+}
 </script>
 
 </body>
