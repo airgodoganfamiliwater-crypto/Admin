@@ -8,7 +8,6 @@
 <link rel="icon" href="ikon-512.png">
 <title>Input Admin Cabang</title>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -23,111 +22,38 @@
   --muted:#64748b;
   --border:#e5e7eb;
   --radius:18px;
-
-  /* GLOBAL FONT SIZE */
   --fontSize:14px;
 }
-
-/* GLOBAL SCALE */
-html{
-  font-size:var(--fontSize);
-}
-
-/* FORCE ALL TEXT SCALE */
+html{font-size:var(--fontSize);}
 body, input, textarea, button, label, h1, h2, h3, h4, h5, h6, small, div, span {
   font-size:1rem !important;
 }
-
-*{
-  box-sizing:border-box;
-  font-family:'Nunito',sans-serif;
-  user-select:none;
-  outline:none;
-}
-
-body{
-  margin:0;
-  min-height:100vh;
-  background:var(--bg);
-  color:var(--text);
-}
-
-.header{
-  height:220px;
-  background:var(--primary);
-  border-radius:0 0 32px 32px;
-}
-
-.container{
-  padding:0 16px 32px;
-  margin-top:-150px;
-}
-
+*{box-sizing:border-box;font-family:'Nunito',sans-serif;user-select:none;outline:none;}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);}
+.header{height:220px;background:var(--primary);border-radius:0 0 32px 32px;}
+.container{padding:0 16px 32px;margin-top:-150px;}
 .card{
-  max-width:520px;
-  margin:auto;
-  background:var(--card);
-  padding:18px;
-  border-radius:var(--radius);
+  max-width:520px;margin:auto;background:var(--card);
+  padding:18px;border-radius:var(--radius);
   border:1px solid var(--border);
   box-shadow:0 10px 25px rgba(0,0,0,.07);
 }
-
-h2{margin-bottom:12px}
-h3{margin-top:18px}
-
-/* INPUT RESPONSIVE SCALE */
 input{
-  width:100%;
-  padding:0.7em;
-  margin:0.4em 0;
-  border-radius:0.8em;
-  border:1px solid var(--border);
-  font-size:1rem;
+  width:100%;padding:0.7em;margin:0.4em 0;
+  border-radius:0.8em;border:1px solid var(--border);
 }
-input::placeholder{font-size:1rem;}
-
 .row{display:flex;gap:8px}
-small{color:var(--muted)}
-
 button{
-  padding:0.8em;
-  border:none;
-  border-radius:0.8em;
-  background:var(--primary);
-  color:white;
-  font-weight:bold;
-  width:100%;
-  margin-top:0.8em;
-  transition:.25s ease;
+  padding:0.8em;border:none;border-radius:0.8em;
+  background:var(--primary);color:white;font-weight:bold;width:100%;
 }
-button:hover{
-  filter:brightness(1.08);
-  box-shadow:0 6px 20px rgba(37,99,235,.35);
-  transform:translateY(-1px);
-}
-button:active{transform:scale(.96)}
-
-.btn-add{
-  background:var(--primary-soft);
-  color:var(--primary);
-}
-
-/* Popup */
+.btn-add{background:var(--primary-soft);color:var(--primary);}
 .popup-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  justify-content:center;
-  align-items:center;
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
+  display:none;justify-content:center;align-items:center;
 }
 .popup-card{
-  background:white;
-  padding:1.2em;
-  border-radius:1em;
-  width:18em;
-  text-align:center;
+  background:white;padding:1.2em;border-radius:1em;width:18em;text-align:center;
 }
 </style>
 </head>
@@ -138,29 +64,10 @@ button:active{transform:scale(.96)}
 <div class="container">
 <div class="card">
 
-<!-- HEADER + FONT CONTROL -->
-<div style="display:flex;justify-content:space-between;align-items:center">
-  <h2>Input Data</h2>
-  <div>
-    <button id="fontMinus" style="width:auto;padding:.3em .6em;border-radius:50%">−</button>
-    <button id="fontPlus" style="width:auto;padding:.3em .6em;border-radius:50%">+</button>
-  </div>
-</div>
+<h2>Input Data</h2>
 
 <label>Tanggal</label>
 <input type="date" id="tanggal">
-
-<label>Loyang</label>
-<input inputmode="numeric" id="loyang">
-
-<label>Galon</label>
-<input inputmode="numeric" id="galon">
-
-<label>Fee</label>
-<input inputmode="numeric" id="fee">
-
-<label>Saldo</label>
-<input inputmode="numeric" id="saldo">
 
 <h3>Klien & Sales</h3>
 
@@ -179,18 +86,15 @@ button:active{transform:scale(.96)}
 <h3>Pengeluaran</h3>
 
 <div class="row">
-  <input inputmode="numeric" id="gasQty" placeholder="Gas qty">
-  <input inputmode="numeric" id="gasHarga" placeholder="Harga">
+  <input inputmode="numeric" id="gasHarga" placeholder="Gas">
 </div>
 
 <div class="row">
-  <input inputmode="numeric" id="tutupQty" placeholder="Tutup qty">
-  <input inputmode="numeric" id="tutupHarga" placeholder="Harga">
+  <input inputmode="numeric" id="tutupHarga" placeholder="Tutup">
 </div>
 
 <div class="row">
-  <input inputmode="numeric" id="bensinQty" placeholder="Bensin qty">
-  <input inputmode="numeric" id="bensinHarga" placeholder="Harga">
+  <input inputmode="numeric" id="bensinHarga" placeholder="Bensin">
 </div>
 
 <label>Listrik</label>
@@ -204,14 +108,9 @@ button:active{transform:scale(.96)}
 
 <button onclick="kirim()">Kirim Data</button>
 
-<button onclick="location.href='riwayat.html'" style="background:#f1f5f9;color:#2563eb;border:1px solid #e5e7eb">
-📊 Riwayat Data
-</button>
-
 </div>
 </div>
 
-<!-- POPUP -->
 <div id="popup" class="popup-bg">
   <div class="popup-card">
     <p id="popupText"></p>
@@ -220,7 +119,6 @@ button:active{transform:scale(.96)}
 </div>
 
 <script>
-// Firebase
 firebase.initializeApp({
  apiKey:"AIzaSyCl13_a4x-BQnWNUjf9JOQX1DKc-HxLBys",
  authDomain:"klien-39696.firebaseapp.com",
@@ -229,16 +127,14 @@ firebase.initializeApp({
 const auth=firebase.auth();
 const db=firebase.firestore();
 
-// AUTH CHECK
 let adminData=null;
 auth.onAuthStateChanged(async u=>{
  if(!u) return location.href="login.html";
  const doc=await db.collection("adminCabang").doc(u.uid).get();
- if(!doc.exists || doc.data().status!=="approved") return location.href="login.html";
+ if(!doc.exists) return location.href="login.html";
  adminData=doc.data();
 });
 
-// FORMAT
 function formatRupiah(n){
  return "Rp "+(Number(n)||0).toLocaleString("id-ID");
 }
@@ -249,7 +145,6 @@ function formatInput(el){
  el.value = el.value.replace(/\D/g,"").replace(/\B(?=(\d{3})+(?!\d))/g,".");
 }
 
-// Auto format
 document.querySelectorAll("input").forEach(i=>{
  i.addEventListener("input",()=>{
   if(i.inputMode==="numeric" && !i.readOnly){
@@ -259,7 +154,6 @@ document.querySelectorAll("input").forEach(i=>{
  });
 });
 
-// HITUNG
 function hitung(){
  const klien=getRaw("klien");
  const payKl=klien*5500;
@@ -278,7 +172,6 @@ function hitung(){
  totalProfit.value=formatRupiah(total);
 }
 
-// Dynamic lainnya
 let lainCount=0;
 function tambahLainnya(){
  lainCount++;
@@ -289,125 +182,72 @@ function tambahLainnya(){
   <input inputmode="numeric" class="lainHarga" id="lain${lainCount}" placeholder="Harga">
  `;
  document.getElementById("lainnyaBox").appendChild(div);
- div.querySelector(".lainHarga").addEventListener("input",()=>{formatInput(div.querySelector(".lainHarga"));hitung();});
+ div.querySelector(".lainHarga").addEventListener("input",()=>{
+   formatInput(div.querySelector(".lainHarga"));
+   hitung();
+ });
 }
 
-// POPUP
 function showPopup(msg){
  popupText.innerText=msg;
  popup.style.display="flex";
 }
 function closePopup(){popup.style.display="none";}
 
-// FORM EMPTY CHECK
 function isEmptyForm(){
-  return !(
-    tanggal.value &&
-    loyang.value &&
-    galon.value &&
-    saldo.value
-  );
+  return !tanggal.value;
 }
 
-/* GLOBAL FONT CONTROL */
-let fontSize = localStorage.getItem("fontSizeAdmin") ? parseInt(localStorage.getItem("fontSizeAdmin")) : 14;
-function applyFont(){
- document.documentElement.style.setProperty("--fontSize", fontSize+"px");
-}
-applyFont();
-
-fontPlus.onclick=()=>{
- if(fontSize<28){fontSize++;applyFont();localStorage.setItem("fontSizeAdmin",fontSize);}
-};
-fontMinus.onclick=()=>{
- if(fontSize>10){fontSize--;applyFont();localStorage.setItem("fontSizeAdmin",fontSize);}
-};
-
-// SUBMIT
 async function kirim(){
-
-  // VALIDASI WAJIB
   if(isEmptyForm()){
-    showPopup("❌ Data belum lengkap!");
+    showPopup("❌ Isi tanggal dulu!");
     return;
   }
 
-  // ================= PENGELUARAN LAINNYA =================
-  let lainnya = [];
-  let totalLainnya = 0;
+  let lainnya=[];
+  let totalLain=0;
 
   document.querySelectorAll("#lainnyaBox .row").forEach(row=>{
-    const ket = row.children[0].value || "";
-    const harga = Number(row.children[1].value.replace(/\./g,"")) || 0;
-    if(ket || harga){
-      lainnya.push({keterangan: ket, harga: harga});
-      totalLainnya += harga;
+    const ket=row.children[0].value;
+    const harga=getRaw(row.children[1].id);
+    if(ket||harga){
+      lainnya.push({keterangan:ket,harga:harga});
+      totalLain+=harga;
     }
   });
 
-  // ================= HITUNG TOTAL =================
-  const klienPay = getRaw("klien") * 5500;
-  const salesPay = getRaw("paySales");
+  const klienPay=getRaw("klien")*5500;
+  const salesPay=getRaw("paySales");
 
-  const gas = getRaw("gasHarga");
-  const tutup = getRaw("tutupHarga");
-  const bensin = getRaw("bensinHarga");
-  const listrik = getRaw("listrik");
+  const gas=getRaw("gasHarga");
+  const tutup=getRaw("tutupHarga");
+  const bensin=getRaw("bensinHarga");
+  const listrik=getRaw("listrik");
 
-  const totalPengeluaran = gas + tutup + bensin + listrik + totalLainnya;
-  const totalProfit = (klienPay + salesPay) - totalPengeluaran;
+  const totalPengeluaran=gas+tutup+bensin+listrik+totalLain;
+  const totalProfit=(klienPay+salesPay)-totalPengeluaran;
 
-  // ================= DATA FIRESTORE =================
-  const data = {
-    tanggal: tanggal.value,
-    loyang: getRaw("loyang"),
-    galon: getRaw("galon"),
-    fee: getRaw("fee"),
-    saldo: getRaw("saldo"),
-
-    klien: getRaw("klien"),
-    pembayaranKlien: klienPay,
-
-    sales: getRaw("sales"),
-    pembayaranSales: salesPay,
-
-    pengeluaran: {
-      gas: gas,
-      tutup: tutup,
-      bensin: bensin,
-      listrik: listrik,
-      lainnya: lainnya,
-      totalPengeluaran: totalPengeluaran
+  const data={
+    tanggal:tanggal.value,
+    klien:getRaw("klien"),
+    pembayaranKlien:klienPay,
+    sales:getRaw("sales"),
+    pembayaranSales:salesPay,
+    pengeluaran:{
+      gas,tutup,bensin,listrik,lainnya,totalPengeluaran
     },
-
-    totalProfit: totalProfit,
-
-    adminUID: auth.currentUser.uid,
-    adminNama: adminData?.nama || "unknown",
-    adminID: adminData?.id || "unknown",
-
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    totalProfit:totalProfit,
+    adminUID:auth.currentUser.uid,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  // ================= SIMPAN =================
   try{
     await db.collection("inputAdmin").add(data);
-    showPopup("✅ Data berhasil disimpan");
-    setTimeout(()=>location.href="riwayat.html",1200);
+    showPopup("✅ Berhasil disimpan");
   }catch(e){
-    console.error(e);
-    showPopup("❌ Gagal simpan data");
+    showPopup("❌ Gagal");
   }
 }
-  // PWA 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('✅ Service Worker registered'))
-        .catch(err => console.error('❌ Service Worker failed:', err));
-    });
-  }
 </script>
-
 </body>
 </html>
