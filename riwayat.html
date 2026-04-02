@@ -21,19 +21,11 @@
   --radius:18px;
   --fontSize:14px;
 }
-
 html{font-size:var(--fontSize);}
-/* FORCE ALL TEXT SCALE */
 body, input, textarea, button, label, h1, h2, h3, h4, h5, h6, small, div, span {
   font-size:1rem !important;
 }
-*{
-  box-sizing:border-box;
-  font-family:'Nunito',sans-serif;
-  user-select:none;
-  outline:none;
-  -webkit-tap-highlight-color: transparent;
-}
+*{box-sizing:border-box;font-family:'Nunito',sans-serif;user-select:none;outline:none;}
 
 body{
   margin:0;
@@ -41,13 +33,11 @@ body{
   background:var(--bg);
   color:var(--text);
 }
-
 .header{
   height:220px;
   background:var(--primary);
   border-radius:0 0 32px 32px;
 }
-
 .container{
   padding:0 16px 32px;
   margin-top:-150px;
@@ -61,24 +51,16 @@ body{
   border:1px solid var(--border);
   box-shadow:0 10px 25px rgba(0,0,0,.06);
 }
-
 .item{
   padding:12px;
   border-radius:12px;
   border:1px solid var(--border);
   margin-bottom:12px;
   background:white;
-  transition:.2s;
 }
-.item:hover{
-  background:var(--primary-soft);
-  transform:scale(1.01);
-}
-
 .line{margin:3px 0}
 .bold{font-weight:bold}
 .small{color:#64748b}
-
 .btn{
   padding:12px;
   border:none;
@@ -88,31 +70,7 @@ body{
   font-weight:bold;
   width:100%;
   margin-bottom:10px;
-  cursor:pointer;
-  transition:.2s;
 }
-.btn:hover{opacity:.9}
-.btn:active{transform:scale(.96)}
-
-button{
-  padding:0.8em;
-  border:none;
-  border-radius:0.8em;
-  background:var(--primary);
-  color:white;
-  font-weight:bold;
-  width:100%;
-  margin-top:0.8em;
-  transition:.25s ease;
-}
-button:hover{
-  filter:brightness(1.08);
-  box-shadow:0 6px 20px rgba(37,99,235,.35);
-  transform:translateY(-1px);
-}
-button:active{transform:scale(.96)}
-
-/* Summary box */
 .summary{
   margin-top:12px;
   padding:14px;
@@ -131,31 +89,24 @@ button:active{transform:scale(.96)}
 
 <div class="card">
 
-<!-- HEADER + FONT CONTROL -->
-<div style="display:flex;justify-content:space-between;align-items:center">
-  <h2>Riwayat</h2>
-  <div>
-    <button id="fontMinus" style="width:auto;padding:.3em .6em;border-radius:50%">−</button>
-    <button id="fontPlus" style="width:auto;padding:.3em .6em;border-radius:50%">+</button>
-  </div>
-</div>
+<h2>Riwayat</h2>
 
 <button class="btn" onclick="location.href='index.html'">Input Baru</button>
 
 <div id="list"></div>
 
-<!-- TOTAL SUMMARY -->
 <div id="summaryTotal" class="summary">
-  Total Profit Keseluruhan: Rp 0
+  Total Profit: Rp 0
 </div>
 
 </div>
 </div>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
 <script>
-// Firebase
 firebase.initializeApp({
   apiKey:"AIzaSyCl13_a4x-BQnWNUjf9JOQX1DKc-HxLBys",
   authDomain:"klien-39696.firebaseapp.com",
@@ -167,12 +118,10 @@ const db = firebase.firestore();
 const list = document.getElementById("list");
 const summaryTotal = document.getElementById("summaryTotal");
 
-// Rupiah format
 function rupiah(n){
   return "Rp "+(Number(n)||0).toLocaleString("id-ID");
 }
 
-// Format tanggal Indonesia
 function formatTanggal(str){
   if(!str) return "-";
   const d = new Date(str);
@@ -184,15 +133,11 @@ function formatTanggal(str){
   });
 }
 
-// AUTH CHECK
 auth.onAuthStateChanged(async user=>{
   if(!user) return location.href="login.html";
-  const doc = await db.collection("adminCabang").doc(user.uid).get();
-  if(!doc.exists || doc.data().status!=="approved") return location.href="login.html";
   loadData(user.uid);
 });
 
-// LOAD DATA (FILTER BULAN SEKARANG)
 async function loadData(uid){
   const snap = await db.collection("inputAdmin")
     .where("adminUID","==",uid)
@@ -204,7 +149,7 @@ async function loadData(uid){
   }
 
   const now = new Date();
-  const currentMonth = now.getMonth(); // 0-11
+  const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
   let arr = [];
@@ -212,7 +157,6 @@ async function loadData(uid){
     const data = d.data();
     if(data.tanggal){
       const t = new Date(data.tanggal);
-      // Filter: hanya bulan dan tahun sekarang
       if(t.getMonth() === currentMonth && t.getFullYear() === currentYear){
         arr.push(data);
       }
@@ -221,31 +165,27 @@ async function loadData(uid){
 
   if(arr.length === 0){
     list.innerHTML="<p class='small'>Belum ada data bulan ini</p>";
-    summaryTotal.innerHTML = "";
+    summaryTotal.innerHTML="";
     return;
   }
 
-  // Sort terbaru
   arr.sort((a,b)=>(b.tanggal||"").localeCompare(a.tanggal||""));
 
-  list.innerHTML = "";
-  let totalAll = 0;
+  list.innerHTML="";
+  let totalAll=0;
 
   arr.forEach(d=>{
     totalAll += Number(d.totalProfit)||0;
 
     const p = d.pengeluaran || {};
-    const lainnya = (p.lainnya || []).map(x=>`${x.keterangan}: ${rupiah(x.harga)}`).join("<br>");
+    const lainnya = (p.lainnya || [])
+      .map(x=>`${x.keterangan}: ${rupiah(x.harga)}`)
+      .join("<br>");
 
     const div = document.createElement("div");
     div.className = "item";
     div.innerHTML = `
       <div class="line bold">📅 ${formatTanggal(d.tanggal)}</div>
-
-      <div class="line">Loyang: <b>${d.loyang||0}</b></div>
-      <div class="line">Galon: <b>${d.galon||0}</b></div>
-      <div class="line">Fee: <b>${d.fee||0}</b></div>
-      <div class="line">Saldo: <b>${d.saldo||0}</b></div>
 
       <hr>
 
@@ -269,47 +209,12 @@ async function loadData(uid){
 
       <hr>
 
-      <div class="line bold">💰 Total Uang: ${rupiah(d.totalProfit)}</div>
+      <div class="line bold">💰 Total Profit: ${rupiah(d.totalProfit)}</div>
     `;
     list.appendChild(div);
   });
 
-  summaryTotal.innerHTML = `Total Uang: <br><span style="font-size:1.3em">${rupiah(totalAll)}</span>`;
-}
-
-/* ========== FONT SIZE GLOBAL CONTROL ========== */
-let fontSize = localStorage.getItem("fontSizeAdmin") 
-  ? parseInt(localStorage.getItem("fontSizeAdmin")) 
-  : 14;
-
-function applyFont(){
-  document.documentElement.style.setProperty("--fontSize", fontSize+"px");
-}
-applyFont();
-
-document.getElementById("fontPlus").onclick=()=>{
-  fontSize++;
-  if(fontSize>28) fontSize=28;
-  applyFont();
-  localStorage.setItem("fontSizeAdmin",fontSize);
-};
-
-document.getElementById("fontMinus").onclick=()=>{
-  if(fontSize>10){
-    fontSize--;
-    applyFont();
-    localStorage.setItem("fontSizeAdmin",fontSize);
-  }
-};
-
-/* ============================================= */
-// PWA 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('✅ Service Worker registered'))
-      .catch(err => console.error('❌ Service Worker failed:', err));
-  });
+  summaryTotal.innerHTML = `Total Profit:<br><span style="font-size:1.3em">${rupiah(totalAll)}</span>`;
 }
 </script>
 
