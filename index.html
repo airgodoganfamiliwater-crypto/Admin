@@ -4,118 +4,123 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="index.css">
 <meta name="theme-color" content="#2563eb">
 <link rel="icon" href="ikon-512.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <title>Input Admin Cabang</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-<style>
-:root{
-  --primary:#2563eb;
-  --primary-soft:#dbeafe;
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --text:#0f172a;
-  --muted:#64748b;
-  --border:#e5e7eb;
-  --radius:18px;
-  --fontSize:14px;
-}
-html{font-size:var(--fontSize);}
-body, input, textarea, button, label, h1, h2, h3, h4, h5, h6, small, div, span {
-  font-size:1rem !important;
-}
-*{box-sizing:border-box;font-family:'Nunito',sans-serif;user-select:none;outline:none;}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);}
-.header{height:220px;background:var(--primary);border-radius:0 0 32px 32px;}
-.container{padding:0 16px 32px;margin-top:-150px;}
-.card{
-  max-width:520px;margin:auto;background:var(--card);
-  padding:18px;border-radius:var(--radius);
-  border:1px solid var(--border);
-  box-shadow:0 10px 25px rgba(0,0,0,.07);
-}
-input{
-  width:100%;padding:0.7em;margin:0.4em 0;
-  border-radius:0.8em;border:1px solid var(--border);
-}
-.row{display:flex;gap:8px}
-button{
-  padding:0.8em;border:none;border-radius:0.8em;
-  background:var(--primary);color:white;font-weight:bold;width:100%;
-  margin-top:0.6em;
-}
-.btn-add{background:var(--primary-soft);color:var(--primary);}
-.popup-bg{
-  position:fixed;inset:0;background:rgba(0,0,0,.4);
-  display:none;justify-content:center;align-items:center;
-}
-.popup-card{
-  background:white;padding:1.2em;border-radius:1em;width:18em;text-align:center;
-}
-</style>
 </head>
 
 <body>
-<div class="header"></div>
 
+<div class="header">
+  <button class="btn-analisa" onclick="openAnalisa()">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 3h2v18H3V3zm4 10h2v8H7v-8zm4-6h2v14h-2V7zm4 4h2v10h-2V11zm4-8h2v18h-2V3z"/>
+    </svg>
+  </button>
+</div>
+<div id="popupAnalisa" class="popup-bg" onclick="closeAnalisa(event)">
+  <div class="popup-card" onclick="event.stopPropagation()">
+
+    <h3>Akses Analisa</h3>
+
+    <input type="password" id="passwordAnalisa" placeholder="Masukkan password">
+
+    <button id="btnLoginAnalisa" onclick="cekPassword()">
+      Masuk
+    </button>
+
+  </div>
+</div>
 <div class="container">
-<div class="card">
+  <div class="card">
+    <!-- TANGGAL -->
+    <div class="date-box">
+      <input type="date" id="tanggal">
+      <span class="date-icon">📆</span>
+      <span class="date-placeholder">Pilih tanggal dulu</span>
+    </div>
+    
+    <label>Jumlah Klien</label>
+    <div class="row">
+      <input inputmode="numeric" id="klien" placeholder="Manaf">
+      <input id="payKlien" readonly placeholder="Otomatis (Rp)">
+    </div>
+    
+    <label>Jumlah Sales</label>
+    <div class="row">
+      <input inputmode="numeric" id="sales" placeholder="Ikin">
+      <input id="paySales" inputmode="numeric" placeholder="Isi manual (Rp)">
+    </div>
 
-<h2>Input Data</h2>
+    <!-- PENGELUARAN (DIUBAH DI SINI SAJA) -->
+    <h3>Pengeluaran</h3>
+    
+    <div class="pengeluaran-row gas">
+      <span>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M6 2a2 2 0 0 0-2 2v14a4 4 0 0 0 8 0V4a2 2 0 0 0-2-2H6zm0 2h4v6H6V4zm10.5 2-.5.5V13a2.5 2.5 0 1 0 5 0V9.5l-1.5-1.5-1.5 1.5V13a.5.5 0 1 1-1 0V6z"/>
+        </svg>
+        Gas
+      </span>
+      <input inputmode="numeric" id="gasHarga" placeholder="Rp">
+    </div>
+    
+    <div class="pengeluaran-row tutup">
+      <span>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 6h18v2H3V6zm2 4h14v10H5V10zm4 2v6h2v-6H9zm4 0v6h2v-6h-2z"/>
+        </svg>
+        Tutup
+      </span>
+      <input inputmode="numeric" id="tutupHarga" placeholder="Rp">
+    </div>
+    
+    <div class="pengeluaran-row bensin">
+      <span>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M16 3H6a2 2 0 0 0-2 2v14h10V5a2 2 0 0 0-2-2zm0 2v4H6V5h10zm3 3 2 2v6a2 2 0 1 1-4 0v-3h2v3a.5.5 0 1 0 1 0v-5l-2-2h1z"/>
+        </svg>
+        Bensin
+      </span>
+      <input inputmode="numeric" id="bensinHarga" placeholder="Rp">
+    </div>
+    
+    <div class="pengeluaran-row listrik">
+      <span>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 2 3 14h7v8l10-12h-7l0-8z"/>
+        </svg>
+        Listrik
+      </span>
+      <input inputmode="numeric" id="listrik" placeholder="Rp">
+    </div>
 
-<label>Tanggal</label>
-<input type="date" id="tanggal">
+    <!-- LAINNYA -->
+    <div id="lainnyaBox"></div>
+    <button class="btn-add" onclick="tambahLainnya()">
+      ➕ Tambah Pengeluaran Lain
+    </button>
 
-<h3>Klien & Sales</h3>
+    <!-- TOTAL -->
+    <h3>Total Uang</h3>
+    <input id="totalProfit" readonly placeholder="Hasil otomatis">
 
-<label>Klien</label>
-<div class="row">
-  <input inputmode="numeric" id="klien">
-  <input id="payKlien" readonly placeholder="Rp 0">
+    <!-- SUBMIT -->
+    <div class="btn-group">
+      <button class="btn-primary" onclick="kirim()">✅ Kirim</button>
+      <button class="btn-secondary" onclick="location.href='riwayat.html'">📊 Riwayat</button>
+    </div>
+
+  </div>
 </div>
 
-<label>Sales</label>
-<div class="row">
-  <input inputmode="numeric" id="sales">
-  <input id="paySales" inputmode="numeric" placeholder="Rp manual">
-</div>
-
-<h3>Pengeluaran</h3>
-
-<div class="row">
-  <input inputmode="numeric" id="gasHarga" placeholder="Gas">
-</div>
-
-<div class="row">
-  <input inputmode="numeric" id="tutupHarga" placeholder="Tutup">
-</div>
-
-<div class="row">
-  <input inputmode="numeric" id="bensinHarga" placeholder="Bensin">
-</div>
-
-<label>Listrik</label>
-<input inputmode="numeric" id="listrik">
-
-<div id="lainnyaBox"></div>
-<button class="btn-add" onclick="tambahLainnya()">➕ Tambah Lainnya</button>
-
-<h3>Total Uang</h3>
-<input id="totalProfit" readonly>
-
-<button onclick="kirim()">Kirim Data</button>
-
-<button onclick="location.href='riwayat.html'" style="background:#f1f5f9;color:#2563eb;border:1px solid #e5e7eb">
-📊 Riwayat Data
-</button>
-
-</div>
-</div>
-
+<!-- POPUP -->
 <div id="popup" class="popup-bg">
   <div class="popup-card">
     <p id="popupText"></p>
@@ -123,136 +128,7 @@ button{
   </div>
 </div>
 
-<script>
-firebase.initializeApp({
- apiKey:"AIzaSyCl13_a4x-BQnWNUjf9JOQX1DKc-HxLBys",
- authDomain:"klien-39696.firebaseapp.com",
- projectId:"klien-39696"
-});
-const auth=firebase.auth();
-const db=firebase.firestore();
+<script src="index.js"></script>
 
-let adminData=null;
-auth.onAuthStateChanged(async u=>{
- if(!u) return location.href="login.html";
- const doc=await db.collection("adminCabang").doc(u.uid).get();
- if(!doc.exists) return location.href="login.html";
- adminData=doc.data();
-});
-
-function formatRupiah(n){
- return "Rp "+(Number(n)||0).toLocaleString("id-ID");
-}
-function getRaw(id){
- return Number(document.getElementById(id).value.replace(/\./g,""))||0;
-}
-function formatInput(el){
- el.value = el.value.replace(/\D/g,"").replace(/\B(?=(\d{3})+(?!\d))/g,".");
-}
-
-document.querySelectorAll("input").forEach(i=>{
- i.addEventListener("input",()=>{
-  if(i.inputMode==="numeric" && !i.readOnly){
-    formatInput(i);
-  }
-  hitung();
- });
-});
-
-function hitung(){
- const klien=getRaw("klien");
- const payKl=klien*5500;
- payKlien.value=formatRupiah(payKl);
-
- const salesPay=getRaw("paySales");
- const gas=getRaw("gasHarga");
- const tutup=getRaw("tutupHarga");
- const bensin=getRaw("bensinHarga");
- const listrik=getRaw("listrik");
-
- let lain=0;
- document.querySelectorAll(".lainHarga").forEach(i=>lain+=getRaw(i.id));
-
- const total=payKl+salesPay-(gas+tutup+bensin+listrik+lain);
- totalProfit.value=formatRupiah(total);
-}
-
-let lainCount=0;
-function tambahLainnya(){
- lainCount++;
- const div=document.createElement("div");
- div.className="row";
- div.innerHTML=`
-  <input placeholder="Keterangan">
-  <input inputmode="numeric" class="lainHarga" id="lain${lainCount}" placeholder="Harga">
- `;
- document.getElementById("lainnyaBox").appendChild(div);
- div.querySelector(".lainHarga").addEventListener("input",()=>{
-   formatInput(div.querySelector(".lainHarga"));
-   hitung();
- });
-}
-
-function showPopup(msg){
- popupText.innerText=msg;
- popup.style.display="flex";
-}
-function closePopup(){popup.style.display="none";}
-
-function isEmptyForm(){
-  return !tanggal.value;
-}
-
-async function kirim(){
-  if(isEmptyForm()){
-    showPopup("❌ Isi tanggal dulu!");
-    return;
-  }
-
-  let lainnya=[];
-  let totalLain=0;
-
-  document.querySelectorAll("#lainnyaBox .row").forEach(row=>{
-    const ket=row.children[0].value;
-    const harga=getRaw(row.children[1].id);
-    if(ket||harga){
-      lainnya.push({keterangan:ket,harga:harga});
-      totalLain+=harga;
-    }
-  });
-
-  const klienPay=getRaw("klien")*5500;
-  const salesPay=getRaw("paySales");
-
-  const gas=getRaw("gasHarga");
-  const tutup=getRaw("tutupHarga");
-  const bensin=getRaw("bensinHarga");
-  const listrik=getRaw("listrik");
-
-  const totalPengeluaran=gas+tutup+bensin+listrik+totalLain;
-  const totalProfit=(klienPay+salesPay)-totalPengeluaran;
-
-  const data={
-    tanggal:tanggal.value,
-    klien:getRaw("klien"),
-    pembayaranKlien:klienPay,
-    sales:getRaw("sales"),
-    pembayaranSales:salesPay,
-    pengeluaran:{
-      gas,tutup,bensin,listrik,lainnya,totalPengeluaran
-    },
-    totalProfit:totalProfit,
-    adminUID:auth.currentUser.uid,
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  try{
-    await db.collection("inputAdmin").add(data);
-    showPopup("✅ Berhasil disimpan");
-  }catch(e){
-    showPopup("❌ Gagal");
-  }
-}
-</script>
 </body>
 </html>

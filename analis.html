@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="ikon-512.png">
+
+<!-- FONT SAMA -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="analis.css">
+<title>Analisa</title>
+</head>
+
+<body>
+
+<div class="header"></div>
+
+<div class="container">
+  <div class="card">
+
+    <h2>Analisa</h2>
+
+    <!-- TAB MENU -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('klien')">Klien</div>
+      <div class="tab" onclick="switchTab('sales')">Sales</div>
+      <div class="tab" onclick="switchTab('data')">Data</div>
+    </div>
+
+    <!-- ================= TAB KLIEN ================= -->
+    <div id="tab-klien" class="tab-content active">
+
+      <button class="btn" id="btnFilter" onclick="openFilter()">
+        .....
+      </button>
+
+      <button class="btn" onclick="location.href='index.html'">
+        ➕ Input Baru
+      </button>
+
+      <div id="list"></div>
+
+      <div id="summaryTotal" class="summary">
+        Total Profit: Rp 0
+      </div>
+
+    </div>
+
+    <!-- ================= TAB SALES ================= -->
+    <div id="tab-sales" class="tab-content">
+    
+
+    
+      <div id="listSales"></div>
+    
+      <div id="summarySales" class="summary">
+        Total Sales: Rp 0
+      </div>
+    
+    </div>
+
+    <!-- ================= TAB DATA ================= -->
+    <div id="tab-data" class="tab-content">
+      <div class="summary">
+        🚧 Analisa data tambahan akan tampil di sini
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- POPUP FILTER -->
+<div id="filterPopup" class="popup-bg">
+  <div class="popup-card">
+    
+    <h3>Pilih Periode</h3>
+
+    <label>Bulan</label>
+    <select id="filterBulan">
+      <option value="0">Januari</option>
+      <option value="1">Februari</option>
+      <option value="2">Maret</option>
+      <option value="3">April</option>
+      <option value="4">Mei</option>
+      <option value="5">Juni</option>
+      <option value="6">Juli</option>
+      <option value="7">Agustus</option>
+      <option value="8">September</option>
+      <option value="9">Oktober</option>
+      <option value="10">November</option>
+      <option value="11">Desember</option>
+    </select>
+
+    <label>Tahun</label>
+    <select id="filterTahun"></select>
+
+    <button onclick="applyFilter()">Terapkan</button>
+    <button onclick="closeFilter()" style="background:#e5e7eb;color:#111">
+      Batal
+    </button>
+
+  </div>
+</div>
+<!-- POPUP VALIDASI -->
+<div id="popupValidasi" class="popup-bg" onclick="closeValidasi(event)">
+  <div class="popup-card">
+    
+    <h3>Input Validasi</h3>
+
+    <input id="inputValidasi" inputmode="numeric" placeholder="Masukkan nominal">
+
+    <button onclick="simpanValidasi()">Simpan</button>
+    <button onclick="closeValidasi()" style="background:#e5e7eb;color:#111">
+      Batal
+    </button>
+
+  </div>
+</div>
+
+<!-- SCROLL TOP -->
+<button id="scrollTopBtn" onclick="scrollToTop()">⬆️</button>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<!-- TAB SCRIPT -->
+<script>
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.classList.remove("active");
+  });
+
+  document.querySelectorAll(".tab-content").forEach(c=>{
+    c.classList.remove("active");
+  });
+
+  document.querySelector(`[onclick="switchTab('${tab}')"]`)
+    .classList.add("active");
+
+  document.getElementById("tab-"+tab)
+    .classList.add("active");
+}
+</script>
+
+<!-- MAIN SCRIPT -->
+<script src="analis.js"></script>
+
+</body>
+</html>
