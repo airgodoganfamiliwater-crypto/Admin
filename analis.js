@@ -1,4 +1,3 @@
-
 firebase.initializeApp({
   apiKey:"AIzaSyCl13_a4x-BQnWNUjf9JOQX1DKc-HxLBys",
   authDomain:"klien-39696.firebaseapp.com",
@@ -7,6 +6,7 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 const db = firebase.firestore();
+
 const list = document.getElementById("list");
 const summaryTotal = document.getElementById("summaryTotal");
 const listSales = document.getElementById("listSales");
@@ -14,15 +14,30 @@ const summarySales = document.getElementById("summarySales");
 
 let selectedMonth;
 let selectedYear;
-let selectedDocId = null; // ⬅️ simpan doc yg diklik
+let selectedDocId = null;
+
+/* ================= UTIL ================= */
 
 function rupiah(n){
   return "Rp "+(Number(n)||0).toLocaleString("id-ID");
 }
+
 function toNumber(val){
-  if(val === "" || val === null || val === undefined) return 0;
-  return Number(val) || 0;
+  if(val === null || val === undefined || val === "") return null;
+  return Number(val);
 }
+
+// 🔥 FIX PARSE (SUPPORT MINUS & DESIMAL)
+function parseInputNumber(val){
+  if(!val) return 0;
+
+  return Number(
+    val
+      .replace(/\./g,"")   // hapus ribuan
+      .replace(",",".")    // koma → desimal
+  ) || 0;
+}
+
 function formatTanggal(str){
   if(!str) return "-";
   const d = new Date(str);
@@ -33,6 +48,8 @@ function formatTanggal(str){
     year:"numeric"
   });
 }
+
+/* ================= AUTH ================= */
 
 auth.onAuthStateChanged(async user=>{
   if(!user) return location.href="login.html";
@@ -47,6 +64,9 @@ auth.onAuthStateChanged(async user=>{
 
   loadDataKlien(user.uid);
 });
+
+/* ================= FILTER ================= */
+
 function updateFilterButton(){
   const bulanText = document.getElementById("filterBulan")
     .options[selectedMonth].text;
@@ -54,6 +74,7 @@ function updateFilterButton(){
   document.getElementById("btnFilter").innerText =
     `${bulanText} ${selectedYear}`;
 }
+
 function initTahun(){
   const el = document.getElementById("filterTahun");
   const now = new Date().getFullYear();
@@ -65,10 +86,12 @@ function initTahun(){
     el.appendChild(opt);
   }
 }
+
 function setDefaultFilterUI(){
   document.getElementById("filterBulan").value = selectedMonth;
   document.getElementById("filterTahun").value = selectedYear;
 }
+
 function openFilter(){
   document.getElementById("filterPopup").style.display = "flex";
 }
@@ -76,6 +99,7 @@ function openFilter(){
 function closeFilter(){
   document.getElementById("filterPopup").style.display = "none";
 }
+
 function applyFilter(){
   selectedMonth = Number(document.getElementById("filterBulan").value);
   selectedYear = Number(document.getElementById("filterTahun").value);
@@ -86,15 +110,16 @@ function applyFilter(){
   const user = auth.currentUser;
   if(!user) return;
 
-  // ⬇️ CEK TAB YANG AKTIF
   const activeTab = document.querySelector(".tab.active").innerText;
 
   if(activeTab === "Klien"){
     loadDataKlien(user.uid);
-  }else if(activeTab === "Sales"){
+  }else{
     loadDataSales(user.uid);
   }
 }
+
+/* ================= LOAD KLIEN ================= */
 
 async function loadDataKlien(uid){
   const snap = await db.collection("inputAdmin")
@@ -106,15 +131,15 @@ async function loadDataKlien(uid){
     return;
   }
 
-  const currentMonth = selectedMonth;
-  const currentYear = selectedYear;
-
   let arr = [];
+
   snap.forEach(d=>{
     const data = d.data();
+
     if(data.tanggal){
       const t = new Date(data.tanggal);
-      if(t.getMonth() === currentMonth && t.getFullYear() === currentYear){
+
+      if(t.getMonth() === selectedMonth && t.getFullYear() === selectedYear){
         arr.push(data);
       }
     }
@@ -130,74 +155,110 @@ async function loadDataKlien(uid){
 
   list.innerHTML="";
   let totalOmset = 0;
-  
+
   arr.forEach(d=>{
     const p = d.pengeluaran || {};
-    
+
     const totalPengeluaran = toNumber(p.totalPengeluaran);
     const marginKlien = toNumber(d.marginKlien);
     const omset = toNumber(d.pembagianKlien);
-    totalOmset += omset;
     const validasi = toNumber(d.validasi);
-  
+
+    totalOmset += omset;
+
     const docId = d.adminUID + "_" + d.tanggal;
-  
-    // cek mismatch
     const isMismatch = omset !== validasi;
-  
+
     const div = document.createElement("div");
     div.className = "item";
-  
-    div.onclick = () => openValidasi(docId, validasi);
-  
+
+    div.setAttribute("data-id", docId);
+    div.setAttribute("data-omset", omset);
+    div.setAttribute("data-validasi", validasi ?? "");
+
+    div.onclick = () => openValidasi(docId);
+
     div.innerHTML = `
-      <div class="line bold" style="display:flex;justify-content:space-between;align-items:center;">
+      <div class="line bold" style="display:flex;justify-content:space-between;">
         <span>📅 ${formatTanggal(d.tanggal)}</span>
         ${isMismatch ? `<span class="badge-error">Selisih</span>` : ""}
       </div>
-  
+
       <hr>
-  
+
       <div class="line">Closing Klien: <b>${d.klien || 0}</b></div>
-  
       <div class="line">Pembayaran: <b>${rupiah(d.pembayaranKlien)}</b></div>
-  
       <div class="line">Pengeluaran: <b>${rupiah(totalPengeluaran)}</b></div>
-  
       <div class="line">Margin: <b>${rupiah(marginKlien)}</b></div>
-  
+
       <div class="line">
-        Validasi: <b>${rupiah(validasi)}</b>
+        Validasi: <b class="validasi-value">${rupiah(validasi)}</b>
       </div>
-  
+
       <div class="profit ${omset >= 0 ? "plus" : "minus"}">
         Omset: ${rupiah(omset)}
       </div>
     `;
-  
+
     list.appendChild(div);
   });
 
-summaryTotal.innerHTML = `
-  Total Omset:<br>
-  <span style="font-size:1.3em">${rupiah(totalOmset)}</span>
-  <div class="small">Periode ${selectedMonth+1}/${selectedYear}</div>
-`;
+  summaryTotal.innerHTML = `
+    Total Omset:<br>
+    <span style="font-size:1.3em">${rupiah(totalOmset)}</span>
+    <div class="small">Periode ${selectedMonth+1}/${selectedYear}</div>
+  `;
 }
-function openValidasi(docId, currentValue){
+
+/* ================= VALIDASI ================= */
+
+function openValidasi(docId){
   selectedDocId = docId;
 
+  const div = document.querySelector(`.item[data-id="${docId}"]`);
+  if(!div) return;
+
+  const input = document.getElementById("inputValidasi");
+
+  // 🔥 ambil dari DOM (REALTIME)
+  let val = div.getAttribute("data-validasi");
+
+  if(val === "" || val === null){
+    input.value = "";
+    input.readOnly = false;
+  }else{
+    const angka = Number(val);
+    input.value = angka.toLocaleString("id-ID");
+    input.readOnly = true; // 🔥 langsung readonly kalau sudah ada
+  }
+
   document.getElementById("popupValidasi").style.display = "flex";
-  document.getElementById("inputValidasi").value = currentValue || "";
 }
+
 function closeValidasi(e){
   if(!e || e.target.id === "popupValidasi"){
     document.getElementById("popupValidasi").style.display = "none";
   }
 }
+
+// 🔥 FORMAT INPUT REALTIME
+document.getElementById("inputValidasi").addEventListener("input", e=>{
+  let v = e.target.value;
+
+  const isNegative = v.startsWith("-");
+  v = v.replace(/[^\d,]/g,"");
+
+  let parts = v.split(",");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,".");
+
+  e.target.value = (isNegative ? "-" : "") + parts.join(",");
+});
+
 async function simpanValidasi(){
-  const val = document.getElementById("inputValidasi").value.replace(/\D/g,"");
-  const angka = Number(val) || 0;
+  const raw = document.getElementById("inputValidasi").value;
+
+  // 🔥 kalau kosong → jangan paksa jadi 0
+  const angka = raw === "" ? null : parseInputNumber(raw);
 
   if(!selectedDocId){
     alert("Doc tidak ditemukan");
@@ -212,18 +273,62 @@ async function simpanValidasi(){
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge:true });
 
-    closeValidasi();
+    updateValidasiUI(selectedDocId, angka);
 
-    // reload data
-    const user = auth.currentUser;
-    if(user){
-      loadData(user.uid);
+    const input = document.getElementById("inputValidasi");
+
+    // 🔥 tampilkan sesuai kondisi
+    if(angka === null){
+      input.value = "";
+    }else{
+      input.value = Number(angka).toLocaleString("id-ID");
     }
+
+    input.readOnly = true;
+
+    setTimeout(()=>{
+      closeValidasi();
+      input.readOnly = false;
+    }, 800);
 
   }catch(e){
     alert("Gagal simpan: " + e.message);
   }
 }
+
+function updateValidasiUI(docId, angka){
+  const div = document.querySelector(`.item[data-id="${docId}"]`);
+  if(!div) return;
+
+  // 🔥 SIMPAN KE DOM (INI KUNCINYA)
+  div.setAttribute("data-validasi", angka ?? "");
+
+  const validasiEl = div.querySelector(".validasi-value");
+
+  if(validasiEl){
+    validasiEl.innerText = angka === null ? "-" : rupiah(angka);
+  }
+
+  const omset = Number(div.getAttribute("data-omset")) || 0;
+
+  let badge = div.querySelector(".badge-error");
+
+  const isMismatch = angka === null || omset !== angka;
+
+  if(isMismatch){
+    if(!badge){
+      badge = document.createElement("span");
+      badge.className = "badge-error";
+      badge.innerText = "Selisih";
+      div.querySelector(".line.bold").appendChild(badge);
+    }
+  }else{
+    if(badge) badge.remove();
+  }
+}
+
+/* ================= SALES ================= */
+
 async function loadDataSales(uid){
   const snap = await db.collection("inputAdmin")
     .where("adminUID","==",uid)
@@ -261,28 +366,17 @@ async function loadDataSales(uid){
   let totalSales = 0;
 
   arr.forEach(d=>{
-    const sales = toNumber(d.sales);
     const pembayaran = toNumber(d.pembayaranSales);
-
     totalSales += pembayaran;
 
     const div = document.createElement("div");
     div.className = "item";
 
     div.innerHTML = `
-      <div class="line bold">
-        📅 ${formatTanggal(d.tanggal)}
-      </div>
-
+      <div class="line bold">📅 ${formatTanggal(d.tanggal)}</div>
       <hr>
-
-      <div class="line">
-        Sales: <b>${sales}</b>
-      </div>
-
-      <div class="line">
-        Pembayaran Sales: <b>${rupiah(pembayaran)}</b>
-      </div>
+      <div class="line">Sales: <b>${d.sales || 0}</b></div>
+      <div class="line">Pembayaran Sales: <b>${rupiah(pembayaran)}</b></div>
     `;
 
     listSales.appendChild(div);
@@ -295,46 +389,35 @@ async function loadDataSales(uid){
   `;
 }
 
+/* ================= SCROLL ================= */
+
 const scrollBtn = document.getElementById("scrollTopBtn");
 
-/* DETEKSI SCROLL */
 window.addEventListener("scroll", () => {
-  if(window.scrollY > 300){
-    scrollBtn.classList.add("show");
-  } else {
-    scrollBtn.classList.remove("show");
-  }
+  scrollBtn.classList.toggle("show", window.scrollY > 300);
 });
 
-/* FUNCTION SCROLL KE ATAS */
 function scrollToTop(){
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
+  window.scrollTo({ top:0, behavior:"smooth" });
 }
 
-function switchTab(tab){
-  document.querySelectorAll(".tab").forEach(t=>{
-    t.classList.remove("active");
-  });
+/* ================= TAB ================= */
 
-  document.querySelectorAll(".tab-content").forEach(c=>{
-    c.classList.remove("active");
-  });
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
 
   document.querySelector(`.tab[onclick="switchTab('${tab}')"]`)
     .classList.add("active");
 
-  document.getElementById("tab-"+tab)
-    .classList.add("active");
+  document.getElementById("tab-"+tab).classList.add("active");
 
   const user = auth.currentUser;
   if(!user) return;
 
   if(tab === "klien"){
     loadDataKlien(user.uid);
-  } else if(tab === "sales"){
+  }else{
     loadDataSales(user.uid);
   }
 }
