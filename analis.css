@@ -37,7 +37,7 @@ body{
 
 /* CONTAINER */
 .container{
-  padding:0 18px 40px;
+  padding:0 18px 100px;
   margin-top:-120px;
 }
 /* ================= TAB ================= */
@@ -271,15 +271,38 @@ h4{
 
 /* ================= SUMMARY ================= */
 
-.summary{
-  margin-top:16px;
-  padding:16px;
-  border-radius:14px;
-  background:#f1f5f9;
-  border:1px solid var(--border);
+.summary-box{
+  margin-top:10px;
+  padding:12px;
+  border-radius:12px;
+  background:#f9fafb;
+  border:1px solid #e5e7eb;
+}
+
+.sum-row{
+  display:flex;
+  justify-content:space-between;
+  margin:6px 0;
+  font-size:14px;
+}
+
+.sum-row span{
+  color:#374151;
+}
+
+.sum-row b{
+  font-weight:600;
+}
+
+.sum-row.highlight{
+  font-size:16px;
   font-weight:700;
-  text-align:center;
-  font-size:18px;
+}
+
+.summary .small{
+  font-size:12px;
+  color:#6b7280;
+  text-align:right;
 }
 
 /* ================= POPUP ================= */
@@ -427,7 +450,7 @@ h4{
 
 #scrollTopBtn{
   position:fixed;
-  bottom:20px;
+  bottom:100px;
   right:20px;
 
   width:52px;

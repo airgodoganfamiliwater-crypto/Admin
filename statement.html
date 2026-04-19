@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="ikon-512.png">
+<link rel="stylesheet" href="statement.css">
+<link rel="stylesheet" href="navbar.css">
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Statement</title>
+</head>
+
+<body>
+<div class="header"></div>
+<div class="container">
+  <div class="card filter-bar">
+    <div class="filter-title">Statement</div>
+    <button class="btn-filter" onclick="openFilter()">></button>
+  </div>
+  
+  <div class="card">
+    <div id="statementList"></div>
+  </div>
+  
+  <button class="btn-kirim" onclick="openStatementPopup()">Kirim Statement</button>
+  
+  <div class="popup" id="popupStatement">
+    <div class="popup-content">
+  
+      <input type="date" id="inputTanggal">
+  
+      <input type="number" id="inputKas" placeholder="Kas">
+      <input type="number" id="inputReinvestasi" placeholder="Reinvestasi">
+  
+      <input type="text" id="inputKet" placeholder="Keterangan">
+      <input type="number" id="inputSpend" placeholder="Spend">
+  
+      <button id="btnKirim" onclick="kirimStatement()">Kirim</button>
+  
+    </div>
+  </div>
+  
+  <!-- POPUP FILTER -->
+  <div class="popup" id="popupFilter">
+    <div class="popup-content">
+      
+      <select id="filterBulan">
+        <option value="">Semua Bulan</option>
+        <option>Januari</option>
+        <option>Februari</option>
+        <option>Maret</option>
+        <option>April</option>
+        <option>Mei</option>
+        <option>Juni</option>
+        <option>Juli</option>
+        <option>Agustus</option>
+        <option>September</option>
+        <option>Oktober</option>
+        <option>November</option>
+        <option>Desember</option>
+      </select>
+  
+      <input type="number" id="filterTahun" placeholder="Tahun">
+  
+      <button onclick="applyFilter()">Apply</button>
+      <button onclick="resetFilter()">Reset</button>
+  
+    </div>
+  </div>
+</div>
+<div id="navbar-container"></div>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="navbar.js"></script>
+<script src="statement.js"></script>
+</body>
+</html>

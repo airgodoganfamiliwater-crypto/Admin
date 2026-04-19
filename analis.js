@@ -154,17 +154,30 @@ async function loadDataKlien(uid){
   arr.sort((a,b)=>(b.tanggal||"").localeCompare(a.tanggal||""));
 
   list.innerHTML="";
-  let totalOmset = 0;
+
+  let totalMargin = 0;
+  let totalKlien = 0;
+  let totalPembayaran = 0;
+  let totalPengeluaranAll = 0;
 
   arr.forEach(d=>{
     const p = d.pengeluaran || {};
 
     const totalPengeluaran = toNumber(p.totalPengeluaran);
     const marginKlien = toNumber(d.marginKlien);
-    const omset = toNumber(d.pembagianKlien);
-    const validasi = toNumber(d.validasi);
 
-    totalOmset += omset;
+    // 🔥 INI TETAP (JANGAN DIUBAH)
+    const omset = toNumber(d.pembagianKlien);
+
+    const klien = toNumber(d.klien);
+    const pembayaran = toNumber(d.pembayaranKlien);
+
+    totalMargin += marginKlien;
+    totalKlien += klien;
+    totalPembayaran += pembayaran;
+    totalPengeluaranAll += totalPengeluaran;
+
+    const validasi = toNumber(d.validasi);
 
     const docId = d.adminUID + "_" + d.tanggal;
     const isMismatch = omset !== validasi;
@@ -186,8 +199,8 @@ async function loadDataKlien(uid){
 
       <hr>
 
-      <div class="line">Closing Klien: <b>${d.klien || 0}</b></div>
-      <div class="line">Pembayaran: <b>${rupiah(d.pembayaranKlien)}</b></div>
+      <div class="line">Closing Klien: <b>${klien || 0}</b></div>
+      <div class="line">Pembayaran: <b>${rupiah(pembayaran)}</b></div>
       <div class="line">Pengeluaran: <b>${rupiah(totalPengeluaran)}</b></div>
       <div class="line">Margin: <b>${rupiah(marginKlien)}</b></div>
 
@@ -203,10 +216,44 @@ async function loadDataKlien(uid){
     list.appendChild(div);
   });
 
+  // 🔥 KHUSUS SUMMARY (INI YANG DIUBAH)
+  const totalOmset = totalKlien * 3800;
+
   summaryTotal.innerHTML = `
-    Total Omset:<br>
-    <span style="font-size:1.3em">${rupiah(totalOmset)}</span>
-    <div class="small">Periode ${selectedMonth+1}/${selectedYear}</div>
+    <div class="summary-box">
+  
+      <div class="sum-row">
+        <span>Closing Klien</span>
+        <b>${totalKlien}</b>
+      </div>
+  
+      <div class="sum-row">
+        <span>Pembayaran</span>
+        <b>${rupiah(totalPembayaran)}</b>
+      </div>
+  
+      <div class="sum-row">
+        <span>Pengeluaran</span>
+        <b>${rupiah(totalPengeluaranAll)}</b>
+      </div>
+  
+      <div class="sum-row">
+        <span>Margin</span>
+        <b>${rupiah(totalMargin)}</b>
+      </div>
+  
+      <div class="divider"></div>
+  
+      <div class="sum-row highlight">
+        <span>Total Omset</span>
+        <b>${rupiah(totalOmset)}</b>
+      </div>
+  
+      <div class="small" style="margin-top:8px;">
+        Periode ${selectedMonth+1}/${selectedYear}
+      </div>
+  
+    </div>
   `;
 }
 
@@ -220,17 +267,17 @@ function openValidasi(docId){
 
   const input = document.getElementById("inputValidasi");
 
-  // 🔥 ambil dari DOM (REALTIME)
   let val = div.getAttribute("data-validasi");
 
   if(val === "" || val === null){
     input.value = "";
-    input.readOnly = false;
   }else{
     const angka = Number(val);
     input.value = angka.toLocaleString("id-ID");
-    input.readOnly = true; // 🔥 langsung readonly kalau sudah ada
   }
+
+  // 🔥 SELALU BISA DIEDIT
+  input.readOnly = false;
 
   document.getElementById("popupValidasi").style.display = "flex";
 }
@@ -254,10 +301,12 @@ document.getElementById("inputValidasi").addEventListener("input", e=>{
   e.target.value = (isNegative ? "-" : "") + parts.join(",");
 });
 
+function hitungQty(nominal, pembagi){
+  if(!nominal || nominal <= 0) return 0;
+  return Math.floor(nominal / pembagi) || 1;
+}
 async function simpanValidasi(){
   const raw = document.getElementById("inputValidasi").value;
-
-  // 🔥 kalau kosong → jangan paksa jadi 0
   const angka = raw === "" ? null : parseInputNumber(raw);
 
   if(!selectedDocId){
@@ -266,18 +315,75 @@ async function simpanValidasi(){
   }
 
   try{
-    await db.collection("inputAdmin")
-      .doc(selectedDocId)
+
+    // 🔥 ambil data inputAdmin (buat ambil pengeluaran)
+    const docRef = db.collection("inputAdmin").doc(selectedDocId);
+    const snap = await docRef.get();
+
+    if(!snap.exists){
+      alert("Data tidak ditemukan");
+      return;
+    }
+
+    const data = snap.data();
+    const p = data.pengeluaran || {};
+
+    const gas = toNumber(p.gas) || 0;
+    const tutup = toNumber(p.tutup) || 0;
+    const bensin = toNumber(p.bensin) || 0;
+    const listrik = toNumber(p.listrik) || 0;
+    const lainnya = toNumber(p.lainnya) || 0;
+    const keterangan = p.keterangan || "";
+
+    const totalPengeluaran = toNumber(p.totalPengeluaran) || 0;
+
+    // 🔥 HITUNG QTY SESUAI RULE
+    const gasQty = hitungQty(gas, 20000);
+    const tutupQty = hitungQty(tutup, 120000);
+    const bensinQty = hitungQty(bensin, 15000);
+
+    // 🔥 SIMPAN VALIDASI
+    await docRef.set({
+      validasi: angka,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge:true });
+
+    // 🔥 SIMPAN / UPDATE KE COLLECTION PENGELUARAN
+    await db.collection("pengeluaran")
+      .doc(selectedDocId) // 🔥 pakai ID sama biar auto update
       .set({
-        validasi: angka,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+
+        gas: {
+          qty: gasQty,
+          cost: gas
+        },
+
+        tutup: {
+          qty: tutupQty,
+          cost: tutup
+        },
+
+        bensin: {
+          qty: bensinQty,
+          cost: bensin
+        },
+
+        listrik: listrik,
+
+        lainnya: {
+          keterangan: keterangan,
+          cost: lainnya
+        },
+
+        totalPengeluaran: totalPengeluaran
       }, { merge:true });
 
+    // 🔥 update UI
     updateValidasiUI(selectedDocId, angka);
 
     const input = document.getElementById("inputValidasi");
 
-    // 🔥 tampilkan sesuai kondisi
     if(angka === null){
       input.value = "";
     }else{

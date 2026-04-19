@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="ikon-512.png">
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="navbar.css">
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+<title>Dashboard</title>
+</head>
+
+<body>
+
+<div class="header"></div>
+
+<div class="container">
+  <div class="card">
+
+    <div class="card-header">
+      <img src="logoFW.png" class="logo">
+
+      <div class="text-group">
+        <div class="title">FAMILI WATER</div>
+        <div class="subtitle" id="userEmail">Memuat...</div>
+      </div>
+    </div>
+
+  </div>
+  
+  <div class="card highlight" id="latestCard">
+    <div class="small">Data Terakhir</div>
+  
+    <div class="tanggal" id="latestTanggal">Memuat...</div>
+  
+    <!-- BARIS 1 -->
+    <div class="grid">
+      <div class="box">
+        <div class="label">Klien</div>
+        <div class="value" id="latestKlien">-</div>
+        <div class="sub" id="latestPembayaranKlien">-</div>
+      </div>
+  
+      <div class="box">
+        <div class="label">Sales</div>
+        <div class="value" id="latestSales">-</div>
+        <div class="sub" id="latestPembayaranSales">-</div>
+      </div>
+    </div>
+  
+    <!-- BARIS 2 (FULL) -->
+    <div class="grid-1">
+      <div class="box expense">
+        <div class="label">Total Pengeluaran</div>
+        <div class="value" id="latestPengeluaran">-</div>
+      </div>
+    </div>
+  
+    <!-- BARIS 3 -->
+    <div class="grid">
+      <div class="box margin">
+        <div class="label">Margin All</div>
+        <div class="value" id="latestMarginAll">-</div>
+      </div>
+  
+      <div class="box margin2">
+        <div class="label">Margin Klien</div>
+        <div class="value" id="latestMarginKlien">-</div>
+      </div>
+    </div>
+  </div>
+   
+   <!-- ================= NOTIF CARD ================= -->
+  <div class="card notif" id="notifCard">
+    <div class="notif-header">
+      <div class="notif-title">📢 Notifikasi</div>
+      <div class="notif-date" id="notifDate">-</div>
+    </div>
+  
+    <img id="notifImage" class="notif-img" style="display:none">
+  
+    <div class="notif-text" id="notifText">
+      Tidak ada catatan
+    </div>
+  </div>
+  
+  <!-- ================= POPUP ================= -->
+  <div class="popup" id="popupNotif">
+    <div class="popup-content">
+  
+      <textarea id="inputNotif" placeholder="Tulis catatan..."></textarea>
+  
+      <!-- PREVIEW FOTO -->
+      <div class="preview-box" id="previewBox">
+        <img id="previewImg">
+      </div>
+  
+      <input type="file" id="inputFile" accept="image/*" hidden>
+  
+      <button class="btn" onclick="pickImage()">Pilih Foto</button>
+  
+      <button class="btn primary" id="btnSaveNotif" onclick="simpanNotif()">
+        Simpan
+      </button>
+  
+    </div>
+  </div> 
+  
+  <!-- ================= PROGRESS ================= -->
+  <div class="card progress-card">
+  
+    <div class="progress-header">
+      <div class="progress-title">📊 Progress</div>
+    </div>
+  
+    <div id="progressList" class="progress-list">
+      <div class="empty">Belum ada progress</div>
+    </div>
+  
+    <!-- FLOAT BUTTON -->
+  <button class="fab" onclick="openProgressPopup()">➕</button>
+  
+  </div>
+  
+  <!-- ================= POPUP ================= -->
+  <div class="popup" id="popupProgress">
+    <div class="popup-content">
+  
+      <input type="text" id="inputProgressId" placeholder="Progress (ID)">
+      <textarea id="inputDeskripsi" placeholder="Deskripsi"></textarea>
+  
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="status" value="done">
+          <span>Done</span>
+        </label>
+      
+        <label>
+          <input type="radio" name="status" value="ongoing">
+          <span>Ongoing</span>
+        </label>
+      
+        <label>
+          <input type="radio" name="status" value="plan">
+          <span>Plan</span>
+        </label>
+      </div>
+  
+      <button class="btn primary" id="btnSaveProgress" onclick="simpanProgress()">
+        Simpan
+      </button>
+  
+    </div>
+  </div>
+  
+</div>
+<div id="navbar-container"></div>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="navbar.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
