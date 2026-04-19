@@ -316,7 +316,7 @@ async function simpanValidasi(){
 
   try{
 
-    // 🔥 ambil data inputAdmin (buat ambil pengeluaran)
+    // 🔥 ambil data inputAdmin
     const docRef = db.collection("inputAdmin").doc(selectedDocId);
     const snap = await docRef.get();
 
@@ -328,6 +328,9 @@ async function simpanValidasi(){
     const data = snap.data();
     const p = data.pengeluaran || {};
 
+    // 🔥 AMBIL TANGGAL DARI inputAdmin
+    const tanggal = data.tanggal || null;
+
     const gas = toNumber(p.gas) || 0;
     const tutup = toNumber(p.tutup) || 0;
     const bensin = toNumber(p.bensin) || 0;
@@ -337,7 +340,7 @@ async function simpanValidasi(){
 
     const totalPengeluaran = toNumber(p.totalPengeluaran) || 0;
 
-    // 🔥 HITUNG QTY SESUAI RULE
+    // 🔥 HITUNG QTY
     const gasQty = hitungQty(gas, 20000);
     const tutupQty = hitungQty(tutup, 120000);
     const bensinQty = hitungQty(bensin, 15000);
@@ -348,11 +351,14 @@ async function simpanValidasi(){
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge:true });
 
-    // 🔥 SIMPAN / UPDATE KE COLLECTION PENGELUARAN
+    // 🔥 SIMPAN KE COLLECTION PENGELUARAN + TAMBAH TANGGAL
     await db.collection("pengeluaran")
-      .doc(selectedDocId) // 🔥 pakai ID sama biar auto update
+      .doc(selectedDocId)
       .set({
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+
+        // ✅ INI YANG KAMU MAU
+        tanggal: tanggal,
 
         gas: {
           qty: gasQty,
