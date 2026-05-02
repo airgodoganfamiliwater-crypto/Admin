@@ -12,6 +12,7 @@ const summaryTotal = document.getElementById("summaryTotal");
 
 let selectedMonth;
 let selectedYear;
+let totalClosing = 0;
 
 function rupiah(n){
   return "Rp "+(Number(n)||0).toLocaleString("id-ID");
@@ -121,6 +122,11 @@ async function loadData(uid){
 
   arr.forEach(d=>{
     totalAll += Number(d.totalProfit)||0;
+  
+    const klien = Number(d.klien) || 0;
+    const sales = Number(d.sales) || 0;
+  
+    totalClosing += klien + sales;
 
     const p = d.pengeluaran || {};
     const lainnya = (p.lainnya || [])
@@ -209,7 +215,25 @@ async function loadData(uid){
     list.appendChild(div);
   });
 
-  summaryTotal.innerHTML = `Total Profit:<br><span style="font-size:1.3em">${rupiah(totalAll)}</span>`;
+  summaryTotal.innerHTML = `
+    <div class="summary-box">
+  
+      <div class="sum-row">
+        <span>Total Profit</span>
+        <b>${rupiah(totalAll)}</b>
+      </div>
+  
+      <div class="sum-row">
+        <span>Total Closing</span>
+        <b>${totalClosing}</b>
+      </div>
+  
+      <div class="small">
+        Klien + Sales (${selectedMonth+1}/${selectedYear})
+      </div>
+  
+    </div>
+  `;
 }
 
 const scrollBtn = document.getElementById("scrollTopBtn");
