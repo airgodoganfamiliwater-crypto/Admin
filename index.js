@@ -140,15 +140,25 @@ async function kirim(){
   const totalProfit = (klienPay + salesPay) - totalPengeluaran;
 
   // =======================
-  // 🔥 TAMBAHAN PERHITUNGAN
+  // 🔥 TAMBAHAN PERHITUNGAN (dinamis dari data adminCabang)
   // =======================
 
-  const marginKlien = (klien * 3800) - totalPengeluaran;
+  const marginBase = Number(adminData?.marginKlien) || 0;
+  const gajiKoki = Number(adminData?.gajiKoki) || 0;
+  const ekuitasPersen = Number(adminData?.ekuitas) || 0;
+  const ekuitas = ekuitasPersen / 100;
 
-  const marginAll = ((klien + sales) * 3800) - totalPengeluaran;
+  if(!marginBase || !ekuitas){
+    showPopup("❌ Data pengaturan (marginKlien / ekuitas) belum lengkap. Hubungi pusat.");
+    return;
+  }
+
+  const marginKlien = (klien * marginBase) - totalPengeluaran;
+
+  const marginAll = ((klien + sales) * marginBase) - totalPengeluaran;
 
   const pembagianKlien =
-    (klienPay - totalPengeluaran - (klien * 1500)) * 0.46;
+    (klienPay - totalPengeluaran - (klien * gajiKoki)) * ekuitas;
 
   // =======================
 
